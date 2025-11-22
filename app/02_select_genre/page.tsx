@@ -22,12 +22,11 @@ export default function SelectGenre() {
           const newIndex = index - 1;
           setIndex(newIndex < 0 ? dataList.length - 1 : newIndex);
         }}>◀︎</button>
-        <Link href="/03_select_artist">Next</Link>
+        <Link href={`/03_select_artist?index=${index}`}>Next</Link>
         <button onClick={() => {
           const newIndex = index + 1;
           setIndex(newIndex >= dataList.length ? 0 : newIndex);
           }}>▶︎</button>
-
       </div>
     </div>
   )
