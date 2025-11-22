@@ -5,7 +5,7 @@ export default function HowToEnjoy() {
     <div>
       <h1>How to Enjoy</h1>
       <p>How to enjoy jazz</p>
-      <link href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">How to enjoy jazz</link>
+      <Link href="/02_select_genre">Next</Link>
     </div>
   )
 }
