@@ -5,8 +5,7 @@ import Link from "next/link";
 export default function HowToEnjoy() {
   return(
     <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
-      {/* HOME 링크 */}
-      <Link href="/" className="absolute top-4 left-4 flex items-center gap-2 text-white">
+      <Link href="/" className="absolute top-4 left-4 flex items-center gap-2 text-[#787878]">
         <img src="/img/icon_home.svg" alt="home logo" className="w-4 h-4" />
         <span className="text-sm">HOME</span>
       </Link>
@@ -39,7 +38,7 @@ export default function HowToEnjoy() {
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
         <Link 
           href="/02_select_genre" 
-          className="px-8 py-3 bg-gray-800 border-2 border-green-400 text-white text-sm font-bold block text-center shadow-[0_0_10px_rgba(74,222,128,0.5)]"
+          className="px-8 py-3 border-2 border-[#BAEE2A] font-bold text-center shadow-[0_0_10px]"
         >
           NEXT
         </Link>

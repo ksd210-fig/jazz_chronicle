@@ -12,13 +12,17 @@ export default function SelectArtistPage() {
   const [tab, setTab] = useState<"artist" | "genreInfo">("artist");
 
   return (
-    <div>
-        <Link href="/02_select_genre">↩︎ GENRE</Link>
-        <h1>{dataList[index].genre}</h1>
-        <p>{dataList[index].year}</p>
+    <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
+        <Link href="/02_select_genre" className="absolute top-4 left-4 flex items-center gap-2 text-[#787878]">
+          ↩︎ GENRE
+        </Link>
+        <div className="flex flex-col items-center pt-20 px-6">
+          <h1 className="text-2xl font-bold mb-6 text-center">{dataList[index].genre}</h1>
+          <p>{dataList[index].year}</p>
+        </div>
 
         {/* 탭 버튼 */}
-        <div>
+        <div className="flex justify-center gap-4">
           <button onClick={() => setTab("artist")}>ARTIST</button>
           <button onClick={() => setTab("genreInfo")}>GENRE INFO</button>
         </div>
