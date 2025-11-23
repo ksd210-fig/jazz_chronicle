@@ -14,7 +14,8 @@ export default function SelectArtistPage() {
   return (
     <div>
         <Link href="/02_select_genre">↩︎ GENRE</Link>
-        <h1>Select Artist</h1>
+        <h1>{dataList[index].genre}</h1>
+        <p>{dataList[index].year}</p>
 
         {/* 탭 버튼 */}
         <div>
