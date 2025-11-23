@@ -5,7 +5,7 @@ const dataList: DataType[] = [
       year: "1900",
       improvisation: 2,
       artist: ["Scott Joplin", "Jelly Roll Morton", "W.C Handy"],
-      song: ["1-1", "1-2", "1-3"]
+      song: ["Maple Leaf Rag", "Tiger Rag", "St. Louis Blues"]
     },
     {
       genre: "NEW ORLEANS",
@@ -13,7 +13,7 @@ const dataList: DataType[] = [
       year: "1910",
       improvisation: 4,
       artist: ["Original Dixieland Jass Band", "Joe King Oliver", "New Orleans Rhythm Kings"],
-      song: ["2-1", "2-2", "2-3"]
+      song: ["Livery Stable Blues", "Dipper Mouth Blues", "Panama"]
     },
     {
       genre: "CHICAGO JAZZ",
@@ -21,7 +21,7 @@ const dataList: DataType[] = [
       year: "1920",
       improvisation: 3,
       artist: ["Jelly Roll Morton", "Louis Armstrong & His Hot Five", "3-3"],
-      song: ["3-1", "3-2", "3-3"]
+      song: ["King Porter Stomp", "Hotter Than That", "3-3"]
     },
     {
       genre: "SWING JAZZ",
@@ -29,7 +29,7 @@ const dataList: DataType[] = [
       year: "1930",
       improvisation: 3,
       artist: ["Benny Goodman", "Glenn Miller", "Duke Ellington"],
-      song: ["4-1", "4-2", "4-3"]
+      song: ["Sing Sing Sing", "In the Mood", "Take the 'A' Train"]
     },
     {
       genre: "BEBOP",
@@ -37,7 +37,7 @@ const dataList: DataType[] = [
       year: "1940",
       improvisation: 5,
       artist: ["Dizzy Gillespie", "Thelonious Monk", "Charlie Parker"],
-      song: ["5-1", "5-2", "5-3"]
+      song: ["A Night in Tunisia", "‘Round Midnight", "Ornithology"]
     },
     {
       genre: "COOL JAZZ",
@@ -45,7 +45,7 @@ const dataList: DataType[] = [
       year: "1950",
       improvisation: 2,
       artist: ["Miles Davis", "Dave Brubeck", "Chet Baker"],
-      song: ["6-1", "6-2", "6-3"]
+      song: ["So What", "Take Five", "My Funny Valentine"]
     },
     {
       genre: "HARD BOP",
@@ -53,7 +53,7 @@ const dataList: DataType[] = [
       year: "1960",
       improvisation: 4,
       artist: ["Art Blakey & The Jazz Messengers", "John Coltrane", "Horace Silver"],
-      song: ["7-1", "7-2", "7-3"]
+      song: ["Moanin’", "Giant Steps", "Song for My Father"]
     }
   ];
   

@@ -9,12 +9,13 @@ export default function SelectGenre() {
 
   return(
     <div>
+      <Link href="/">HOME</Link>
       <h1>Select Genre</h1>
       <div>
         <p>Genre : {dataList[index].genre}</p>
         <p>City : {dataList[index].city}</p>
         <p>Year : {dataList[index].year}</p>
-        <p>Improvisation : {dataList[index].improvisation}</p>
+        <p>Improvisation : {"●".repeat(dataList[index].improvisation)}{"◦".repeat(5 - dataList[index].improvisation)}</p>
       </div>
       <p>*Improvisation=즉흥성</p>
       <div>
@@ -31,3 +32,5 @@ export default function SelectGenre() {
     </div>
   )
 }
+
+//{dataList[index].improvisation} 수만큼 ● 출력, 나머지는 ◦ 출력, ●와 ◦의 합계는 5개

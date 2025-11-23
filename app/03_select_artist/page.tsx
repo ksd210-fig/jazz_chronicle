@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import dataList from "@/app/database";
+import Link from "next/link";
 
 export default function SelectArtistPage() {
   const searchParams = useSearchParams(); // 1. useSearchParams로 URL의 쿼리 파라미터 읽기
@@ -10,6 +11,7 @@ export default function SelectArtistPage() {
 
   return (
     <div>
+        <Link href="/02_select_genre">↩︎ GENRE</Link>
         <h1>Select Artist</h1>
         <p>{dataList[index].artist[0]}</p>
         <p>{dataList[index].artist[1]}</p>
