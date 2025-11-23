@@ -32,5 +32,3 @@ export default function SelectGenre() {
     </div>
   )
 }
-
-//{dataList[index].improvisation} 수만큼 ● 출력, 나머지는 ◦ 출력, ●와 ◦의 합계는 5개
