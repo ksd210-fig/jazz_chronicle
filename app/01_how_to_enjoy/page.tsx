@@ -15,7 +15,7 @@ export default function HowToEnjoy() {
         
         <img src="/img/icon_piano_white.svg" alt="piano logo" className="w-8 h-8 mb-8" />
         
-        <div className="text-sm leading-relaxed text-center space-y-4 mb-12">
+        <div className="text-sm leading-relaxed text-center space-y-4 mb-12 font-galmuri">
           <p>
             재즈의 역사는<br/>
             '즉흥성'과 '대중성'의 사이에 있습니다.<br/>
@@ -35,7 +35,7 @@ export default function HowToEnjoy() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+      <div className="absolute bottom-44 left-1/2 transform -translate-x-1/2">
         <Link 
           href="/02_select_genre" 
           className="px-8 py-3 border-2 border-[#BAEE2A] font-bold text-center shadow-[0_0_10px]"

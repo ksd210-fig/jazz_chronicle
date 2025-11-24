@@ -14,7 +14,8 @@ export default function SelectGenre() {
         <span className="text-sm">HOME</span>
       </Link>
       <div className="flex flex-col items-center pt-20 px-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">Select Genre</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">[ Select Genre ]</h1>
+        <img src={dataList[index].map} alt="map" className="w-full h-full" />
         <div>
           <p>Genre : {dataList[index].genre}</p>
           <p>City : {dataList[index].city}</p>

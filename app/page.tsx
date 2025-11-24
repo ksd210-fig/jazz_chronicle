@@ -2,19 +2,19 @@ import Link from "next/link";
 
 export default function Home() {
   return(
-    <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
-      <h1 className="text-2xl font-bold mb-6 text-center">Jazz Chronicle</h1>
-      <p className="text-sm text-center">History of Jazz</p>
+    <div className="w-[360px] h-[800px] bg-[url('/img/bg_main.png')] bg-cover bg-center text-white mx-auto relative">
       
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+      <p className="text-xl text-center text-[#787878] font-bold absolute top-68 left-1/2 transform -translate-x-1/2 font-DogicaPixel font-bold">HISTORY OF JAZZ</p>
+      
+      <div className="absolute bottom-44 left-1/2 transform -translate-x-1/2">
         <Link 
           href="/01_how_to_enjoy" 
           className="px-8 py-3 border-2 border-[#BAEE2A] font-bold text-center shadow-[0_0_10px]">
-            Enter
+            ENTER
         </Link>
       </div>
       
-      <p className="text-sm text-center">©2025 FIG.1 STUDIO</p>
+      <p className="text-sm text-center text-[#787878] absolute bottom-20 left-1/2 transform -translate-x-1/2 font-DogicaPixel font-bold">©2025 FIG.1 STUDIO</p>
     </div>
   )
 }

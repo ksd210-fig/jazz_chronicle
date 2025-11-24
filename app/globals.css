@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Galmuri9';
+  src: url('/font/Galmuri9.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DogicaPixel';
+  src: url('/font/Dogica_Pixel_Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DogicaPixel';
+  src: url('/font/Dogica_Pixel_Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -8,8 +31,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-galmuri: 'Galmuri9';
+  --font-dogica-pixel: 'Dogica Pixel';
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +46,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.font-galmuri {
+  font-family: 'Galmuri9', monospace;
+}
+
+.font-dogica-pixel {
+  font-family: 'DogicaPixel', monospace;
 }
