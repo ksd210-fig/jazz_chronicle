@@ -15,7 +15,7 @@ function getImageTransform(i: number, selectedSong: number): string {
   // 고정된 위치 좌표 (중앙 기준, px 단위)
   const positions = {
     Left: -110,    // 왼쪽으로 120px
-    Center: 0,     // 중앙
+    Center: 0 ,     // 중앙
     Right: 110      // 오른쪽으로 120px
   };
   
@@ -115,9 +115,12 @@ export default function SelectArtistPage() {
                       <p className="font-dogica-pixel">{artist}</p>
                     </div>
                     {isSelected && (
-                      <button className="px-3 py-2 border-2 border-[#BAEE2A] text-[#BAEE2A] font-dogica-pixel">
-                        GAME
-                      </button>
+                      <Link
+                        href={`/04_game?index=${index}&song=${i}`}
+                        className="px-3 py-2 border-2 border-[#BAEE2A] text-[#BAEE2A] font-dogica-pixel"
+                      >
+                        PLAY
+                      </Link>
                     )}
                   </div>
                 </div>
