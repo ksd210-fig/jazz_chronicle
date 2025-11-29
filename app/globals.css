@@ -8,8 +8,15 @@
 }
 
 @font-face {
+  font-family: 'Galmuri7';
+  src: url('/font/Galmuri7.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'DogicaPixel';
-  src: url('/font/Dogica_Pixel_Regular.woff2') format('woff2');
+  src: url('/font/dogicapixel.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -17,7 +24,7 @@
 
 @font-face {
   font-family: 'DogicaPixel';
-  src: url('/font/Dogica_Pixel_Bold.woff2') format('woff2');
+  src: url('/font/dogicapixelbold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -28,12 +35,12 @@
   --foreground: #171717;
 }
 
-@theme inline {
+/* @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-galmuri: 'Galmuri9';
-  --font-dogica-pixel: 'Dogica Pixel';
-}
+  --font-dogica-pixel: 'DogicaPixel';
+} */
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -45,13 +52,74 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: DogicaPixel, Galmuri9;
+  font-family: DogicaPixel, Galmuri9, Galmuri7;
 }
 
 .font-galmuri {
-  font-family: 'Galmuri9';
+  font-family: 'Galmuri9, Galmuri7';
 }
 
 .font-dogica-pixel {
   font-family: 'DogicaPixel';
+}
+
+/* 폰트 시스템 토큰 */
+.T1_20_DB {
+  font-size: 20px;
+  font-family: 'DogicaPixel';
+  font-weight: 700;
+}
+
+.T2_16_DB {
+  font-size: 16px;
+  font-family: 'DogicaPixel';
+  font-weight: 700;
+}
+
+.T3_12_DB {
+  font-size: 12px;
+  font-family: 'DogicaPixel';
+  font-weight: 700;
+}
+
+.T4_10_DB {
+  font-size: 10px;
+  font-family: 'DogicaPixel';
+  font-weight: 700;
+}
+
+.B1_16_G9 {
+  font-size: 16px;
+  font-family: 'Galmuri9';
+  font-weight: normal;
+}
+
+.B2_16_DR {
+  font-size: 16px;
+  font-family: 'DogicaPixel';
+  font-weight: 400;
+}
+
+.B3_14_G9 {
+  font-size: 14px;
+  font-family: 'Galmuri9';
+  font-weight: normal;
+}
+
+.C1_13_DR {
+  font-size: 13px;
+  font-family: 'DogicaPixel';
+  font-weight: 400;
+}
+
+.C2_13_G7 {
+  font-size: 13px;
+  font-family: 'Galmuri7';
+  font-weight: normal;
+}
+
+.C3_12_DR {
+  font-size: 12px;
+  font-family: 'DogicaPixel';
+  font-weight: 400;
 }

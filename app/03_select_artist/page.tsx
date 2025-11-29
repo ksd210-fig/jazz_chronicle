@@ -14,9 +14,9 @@ function getImagePosition(i: number, selectedSong: number): string {
 function getImageTransform(i: number, selectedSong: number): string {
   // 고정된 위치 좌표 (중앙 기준, px 단위)
   const positions = {
-    Left: -110,    // 왼쪽으로 120px
-    Center: 0 ,     // 중앙
-    Right: 110      // 오른쪽으로 120px
+    Left: -110,
+    Center: 0,
+    Right: 110
   };
   
   // 초기 위치 (selectedSong=0일 때의 위치)
@@ -34,34 +34,80 @@ function getImageTransform(i: number, selectedSong: number): string {
 }
 
 export default function SelectArtistPage() {
-  const searchParams = useSearchParams(); // 1. useSearchParams로 URL의 쿼리 파라미터 읽기
-  const indexParameter = searchParams.get("index"); // 2. "index" 파라미터의 값을 가져오기 (문자열로 반환됨)
-  const index = parseInt(indexParameter || "0", 10); // 3. 문자열을 숫자로 변환 (없으면 0으로 기본값 설정, 10진수 변환)
+  const searchParams = useSearchParams();
+  const indexParameter = searchParams.get("index");
+  const index = parseInt(indexParameter || "0", 10);
   const [tab, setTab] = useState<"artist" | "genreInfo">("artist");
   const [selectedSong, setSelectedSong] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (audioRef.current && dataList[index].sound[selectedSong]) {
-      audioRef.current.src = dataList[index].sound[selectedSong];
-      audioRef.current.play();
+    if (!audioRef.current || !dataList[index].sound[selectedSong]) return;
+
+    const audio = audioRef.current;
+    const src = dataList[index].sound[selectedSong];
+
+    if (audio.src !== src) {
+      audio.src = src;
+      audio.load();
     }
+
+    const handleCanPlay = () => {
+      audio.play().catch((err: unknown) => {
+        console.error("Play error:", err);
+      });
+    };
+
+    if (audio.readyState >= 3) {
+      handleCanPlay();
+    } else {
+      audio.addEventListener("canplaythrough", handleCanPlay, { once: true });
+    }
+
+    return () => {
+      audio.removeEventListener("canplaythrough", handleCanPlay);
+    };
   }, [selectedSong, index]);
 
   return (
     <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
-        <Link href="/02_select_genre" className="absolute top-4 left-4 flex items-center gap-2 text-[#787878]">
+        <Link href="/02_select_genre" className="absolute top-4 left-4 flex items-center gap-2 text-[#787878] T3_12_DB">
           ↩︎ GENRE
         </Link>
-        <div className="flex flex-col items-center pt-20 px-6">
-          <h1 className="text-2xl font-bold mb-6 text-center">{dataList[index].genre}</h1>
-          <p>{dataList[index].year}</p>
+        <div className="flex flex-col items-center pt-16 px-6">
+          <div className="relative">
+            <img src="/img/Title Frame.png" alt="Title Frame"></img>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <h1 className="T1_20_DB text-center">{dataList[index].genre}</h1>
+              <p className="B2_16_DR">{dataList[index].year}</p>
+            </div>
+          </div>
         </div>
 
         {/* 탭 버튼 */}
-        <div className="flex justify-center gap-4">
-          <button onClick={() => setTab("artist")} className="border-2 border-[#BAEE2A] px-4 py-2">ARTIST</button>
-          <button onClick={() => setTab("genreInfo")} className="border-2 border-[#BAEE2A] px-4 py-2">GENRE INFO</button>
+        <div className="flex justify-center mt-8 T4_10_DB">
+          <div className="flex border-[2px] border-[#787878] whitespace-nowrap">
+            <button 
+              onClick={() => setTab("artist")} 
+              className={`w-1/2 px-4 py-2 border-r border-[#787878] flex items-center justify-center ${
+                tab === "artist" 
+                  ? "bg-[#556B2F] text-[#BAEE2A]" 
+                  : "bg-[#111111] text-[#787878]"
+              }`}
+            >
+              ARTIST
+            </button>
+            <button 
+              onClick={() => setTab("genreInfo")} 
+              className={`w-1/2 px-4 py-2 flex items-center justify-center ${
+                tab === "genreInfo" 
+                  ? "bg-[#556B2F] text-[#BAEE2A]" 
+                  : "bg-[#111111] text-[#787878]"
+              }`}
+            >
+              GENRE INFO
+            </button>
+          </div>
         </div>
 
         {/* 탭 내용 */}
@@ -71,7 +117,6 @@ export default function SelectArtistPage() {
             const initialPosition = getImagePosition(i, 0);
             const transform = getImageTransform(i, selectedSong);
             
-            // 초기 위치 (selectedSong=0일 때의 위치) - 이미지가 시작하는 위치
             const fixedPosition = initialPosition === "Center" 
               ? "left-1/2" 
               : initialPosition === "Left" 
@@ -81,7 +126,8 @@ export default function SelectArtistPage() {
             return (
               <img 
                 key={i}
-                src={image} 
+                src={image}
+                alt={dataList[index].artist[i]}
                 className={`transition-all duration-500 ease-in-out absolute ${fixedPosition} ${
                   targetPosition === "Center" 
                     ? "z-10 saturate-100" 
@@ -98,28 +144,32 @@ export default function SelectArtistPage() {
         </div>
 
         {tab === "artist" ? (
-          <div className="flex flex-col gap-0">
+          <div className="flex flex-col gap-0 mt-4">
             {dataList[index].artist.map((artist: string, i: number) => {
               const isSelected = getImagePosition(i, selectedSong) === "Center";
               return (
                 <div 
                   key={i} 
                   className={`text-left cursor-pointer ${
-                    isSelected ? "bg-[#556B2F] text-[#BAEE2A]" : "bg-transparent text-white"
+                    isSelected 
+                      ? "bg-[#556B2F] text-[#BAEE2A]" 
+                      : "bg-transparent text-white"
                   }`}
                   onClick={() => setSelectedSong(i)}
                 >
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <div>
-                      <p className="font-dogica-pixel">{dataList[index].song[i]}</p>
-                      <p className="font-dogica-pixel">{artist}</p>
+                  <div className="flex items-center gap-3 px-4 py-2">
+                    <div className="flex-1">
+                      <p className="T3_12_DB">{dataList[index].song[i]}</p>
+                      <p className="C3_12_DR">{artist}</p>
                     </div>
                     {isSelected && (
                       <Link
                         href={`/04_game?index=${index}&song=${i}`}
-                        className="px-3 py-2 border-2 border-[#BAEE2A] text-[#BAEE2A] font-dogica-pixel"
+                        className="px-3 py-1 border-2 border-[#BAEE2A] text-[#BAEE2A] flex flex-col items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        PLAY
+                        <img src="/img/icon_game.svg" alt="game" className="scale-[1.2] mb-1"></img>
+                        <p className="font-dogica-pixel text-[10px]">GAME</p>
                       </Link>
                     )}
                   </div>
@@ -128,8 +178,8 @@ export default function SelectArtistPage() {
             })}
           </div>
         ) : (
-          <div>
-            <p>{dataList[index].GenreInfo}</p>
+          <div className="px-6 py-4">
+            <p className="B3_14_G9">{dataList[index].GenreInfo}</p>
           </div>
         )}
         <audio ref={audioRef} />
