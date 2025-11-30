@@ -33,6 +33,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 컬러 시스템 */
+  --color-black: #111111;
+  --color-white: #FFFFFF;
+  --color-green: #BAEE2A;
+  --color-green-press: #2E351E;
+  --color-gray: #787878;
+  --color-gray-press: #3B3B3B;
 }
 
 /* @theme inline {
@@ -91,7 +99,7 @@ body {
 .B1_16_G9 {
   font-size: 16px;
   font-family: 'Galmuri9';
-  font-weight: normal;
+  font-weight: regular;
 }
 
 .B2_16_DR {
@@ -122,4 +130,77 @@ body {
   font-size: 12px;
   font-family: 'DogicaPixel';
   font-weight: 400;
+}
+
+/* 컬러 시스템 클래스 */
+.bg-black {
+  background-color: var(--color-black);
+}
+
+.bg-white {
+  background-color: var(--color-white);
+}
+
+.bg-green {
+  background-color: var(--color-green);
+}
+
+.bg-green-press {
+  background-color: var(--color-green-press);
+}
+
+.bg-gray {
+  background-color: var(--color-gray);
+}
+
+.bg-gray-press {
+  background-color: var(--color-gray-press);
+}
+
+.text-black {
+  color: var(--color-black);
+}
+
+.text-white {
+  color: var(--color-white);
+}
+
+.text-green {
+  color: var(--color-green);
+}
+
+.text-green-press {
+  color: var(--color-green-press);
+}
+
+.text-gray {
+  color: var(--color-gray);
+}
+
+.text-gray-press {
+  color: var(--color-gray-press);
+}
+
+.border-black {
+  border-color: var(--color-black);
+}
+
+.border-white {
+  border-color: var(--color-white);
+}
+
+.border-green {
+  border-color: var(--color-green);
+}
+
+.border-green-press {
+  border-color: var(--color-green-press);
+}
+
+.border-gray {
+  border-color: var(--color-gray);
+}
+
+.border-gray-press {
+  border-color: var(--color-gray-press);
 }

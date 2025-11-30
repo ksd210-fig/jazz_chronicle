@@ -23,31 +23,29 @@ export default function SelectGenre() {
     { label: "YEAR", value: currentData.year },
   ];
 
-  // 공통 버튼 스타일
-  const buttonStyle = "px-4 py-2 border-2 border-[#787878]";
 
   return (
-    <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
-      <Link href="/" className="absolute top-4 left-4 flex items-center gap-2 text-[#787878]">
+    <div className="w-[360px] h-[800px] bg-black text-white mx-auto relative">
+      <Link href="/" className="absolute top-4 left-4 flex items-center gap-2 text-gray">
         <img src="/img/icon_home.svg" alt="home logo" className="w-4 h-4" />
         <span className="T3_12_DB">HOME</span>
       </Link>
 
       <div className="flex flex-col items-center pt-20 px-6">
-        <h1 className="T1_20_DB mb-6 text-center">[ Select Genre ]</h1>
-        <img src={currentData.map} alt="map" className="w-full max-h-48 object-contain mb-4" />
+        <h1 className="T1_20_DB mb-6 text-center">[ SELECT GENRE ]</h1>
+        <img src={currentData.map} alt="map" className="w-full max-h-48 object-contain mt-12 mb-12" />
 
         {/* 정보 패널 */}
-        <div className="w-full border-2 border-[#787878] mb-4">
+        <div className="w-full border-2 border-gray mb-4">
           {/* 제목 바 */}
-          <div className="bg-[#2E351E] px-4 py-2 flex justify-center border-b border-[#787878]">
-            <h2 className="T2_16_DB text-[#BAEE2A]">{currentData.genre}</h2>
+          <div className="bg-green-press px-4 py-2 flex justify-center border-b border-gray">
+            <h2 className="T2_16_DB text-green">{currentData.genre}</h2>
           </div>
 
           {/* 정보 테이블 */}
-          <div className="relative px-4 py-3 C1_13_DR text-white">
+          <div className="relative px-4 py-3 bg-black C1_13_DR text-white">
             {/* 세로선 */}
-            <div className="absolute left-[40%] top-0 bottom-0 border-l border-[#787878]"></div>
+            <div className="absolute left-[40%] top-0 bottom-0 border-l border-gray"></div>
 
             {/* 정보 행들 */}
             {infoRows.map((row, i) => (
@@ -77,21 +75,21 @@ export default function SelectGenre() {
           </div>
         </div>
 
-        <p className="text-xs text-[#787878] mb-4">*IMPROVISATION=즉흥성</p>
+        <p className="text-xs text-gray mb-4 text-left w-full">*IMPROVISATION=즉흥성</p>
 
-        {/* 네비게이션 버튼 */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-2 T4_10_DB text-white text-center">
-          <button className={buttonStyle} onClick={handlePrev}>
-            ◀︎
-          </button>
-          <Link className="px-6 py-2 border-2 border-[#787878]" href={`/03_select_artist?index=${index}`}>
-            SELECT
-          </Link>
-          <button className={buttonStyle} onClick={handleNext}>
-            ▶︎
-          </button>
-        </div>
-        
+      </div>
+      
+      {/* 네비게이션 버튼 */}
+      <div className="absolute mt-4 left-1/2 transform -translate-x-1/2 flex items-center gap-6 T4_10_DB text-white text-center">
+        <button className="border-2 border-gray flex items-center justify-center p-3" onClick={handlePrev} type="button">
+          <img src="/img/icon_arrow_left.svg" alt="prev" className="min-w-4 min-h-4 block" />
+        </button>
+        <Link className="border-2 border-gray items-center justify-center px-4 py-3" href={`/03_select_artist?index=${index}`}>
+          SELECT
+        </Link>
+        <button className="border-2 border-gray flex items-center justify-center p-3" onClick={handleNext} type="button">
+          <img src="/img/icon_arrow_right.svg" alt="next" className="min-w-4 min-h-4 block" />
+        </button>
       </div>
     </div>
   );

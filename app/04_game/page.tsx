@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import dataList from "../database";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export default function Game() {
   const searchParams = useSearchParams();
@@ -49,16 +50,22 @@ export default function Game() {
   }, [index, songIndex]);
 
   return (
-    <div className="w-[360px] h-[800px] bg-[#111111] text-white mx-auto relative">
-      <p>{dataList[index].artist[songIndex]}</p>
-      <p>{dataList[index].song[songIndex]}</p>
+    <div className="w-[360px] h-[800px] bg-black text-white mx-auto relative">
+      <Link href="/" className="absolute top-4 left-4 flex items-center gap-2 text-gray">
+        <img src="/img/icon_home.svg" alt="home logo" className="w-4 h-4" />
+        <span className="T3_12_DB">HOME</span>
+      </Link>
+      <div className="relative top-20 text-center">
+        <p>{dataList[index].artist[songIndex]}</p>
+        <p>{dataList[index].song[songIndex]}</p>
+      </div>
       
       {/* 카운트다운 오버레이 */}
       {countdown > 0 && (
         <>
           <div className="absolute inset-0 bg-black opacity-50 z-50"></div>
           <div className="absolute inset-0 flex items-center justify-center z-[60]">
-            <p className="text-8xl font-bold text-[#BAEE2A]">{countdown}</p>
+            <p className="text-8xl font-bold text-green">{countdown}</p>
           </div>
         </>
       )}
