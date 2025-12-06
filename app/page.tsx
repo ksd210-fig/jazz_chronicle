@@ -8,7 +8,11 @@ export default function Home() {
 
   return(
     <div className="w-[360px] h-[800px] bg-[url('/img/bg_main.png')] bg-cover bg-center text-white mx-auto relative">
-      <img src="/img/jazz_logo.png" className="scale-68 absolute top-4 left-1/2 transform -translate-x-1/2"></img>
+      <img 
+        src="/img/jazz_logo.png" 
+        className="scale-68 absolute top-4 left-1/2 transform -translate-x-1/2"
+        style={{ animation: 'blink 2s ease-in-out infinite' }}
+      ></img>
       
       <p className="T2_16_DB text-center text-gray absolute top-70 left-1/2 transform -translate-x-1/2 whitespace-nowrap">HISTORY OF JAZZ</p>
       <video src="/img/window.mp4" autoPlay loop muted className="absolute top-79.5 left-1/2 transform -translate-x-1/2 object-cover scale-48"></video>

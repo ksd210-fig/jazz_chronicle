@@ -183,7 +183,7 @@ export default function SelectArtistPage() {
           </>
         ) : (
           <div className="px-6 py-4">
-            <p className="B3_14_G9">{dataList[index].GenreInfo}</p>
+            <p className="B3_14_G9 leading-[1.9]">{dataList[index].GenreInfo}</p>
           </div>
         )}
         <audio ref={audioRef} />
