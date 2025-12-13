@@ -43,13 +43,6 @@
   --color-gray-press: #3B3B3B;
 }
 
-/* @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-galmuri: 'Galmuri9';
-  --font-dogica-pixel: 'DogicaPixel';
-} */
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -63,8 +56,19 @@ body {
   font-family: DogicaPixel, Galmuri9, Galmuri7;
 }
 
+/* 페이지 공통 컨테이너 */
+.page-container {
+  width: 360px;
+  height: 800px;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
 .font-galmuri {
-  font-family: 'Galmuri9, Galmuri7';
+  font-family: 'Galmuri9', 'Galmuri7';
 }
 
 .font-dogica-pixel {
@@ -99,7 +103,7 @@ body {
 .B1_16_G9 {
   font-size: 16px;
   font-family: 'Galmuri9';
-  font-weight: regular;
+  font-weight: 400;
 }
 
 .B2_16_DR {
@@ -220,5 +224,29 @@ body {
 @layer utilities {
   .animate-blink {
     animation: blink 0.5s forwards;
+  }
+  
+  /* 2px 테두리용 모서리 구멍 */
+  .clip-corner-2 {
+    clip-path: polygon(
+      2px 0%, calc(100% - 2px) 0%,
+      calc(100% - 2px) 2px, 100% 2px,
+      100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 2px) 100%, 2px 100%,
+      2px calc(100% - 2px), 0% calc(100% - 2px),
+      0% 2px, 2px 2px
+    );
+  }
+  
+  /* 3px 테두리용 모서리 구멍 */
+  .clip-corner-3 {
+    clip-path: polygon(
+      3px 0%, calc(100% - 3px) 0%,
+      calc(100% - 3px) 3px, 100% 3px,
+      100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px),
+      calc(100% - 3px) 100%, 3px 100%,
+      3px calc(100% - 3px), 0% calc(100% - 3px),
+      0% 3px, 3px 3px
+    );
   }
 }

@@ -19,7 +19,7 @@ const dataList: DataType[] = [
       improvisation: 2,
       map : "/img/Map_01.png",
       artist: ["Scott Joplin", "James Scott", "W.C Handy"],
-      artistImage: ["/img/img_1-1_scott_joplin.png", "/img/img_1-2_jelly_roll_morton.png", "/img/img_1-3_w.c.handy.png"],
+      artistImage: ["/img/img_1-1_scott_joplin.png", "/img/img_1-2_james_scott.png", "/img/img_1-3_w.c.handy.png"],
       song: ["Maple Leaf Rag", "Frog Legs Rag", "St. Louis Blues"],
       sound : ["/music/1-1 Maple Leaf Rag.m4a", "/music/1-2 Frog Legs Rag.m4a", "/music/1-3 St. Louis Blues.m4a"],
       GenreInfo: "랙 타임은 19세기 말 세인트루이스에서 등장한 음악으로, 불규칙한 리듬(Ragged Time)을 특징으로 했습니다. 주요 박자보다 앞선 강세나 긴 음과 짧은 음을 교차시키는 방식으로 독특한 리듬감을 만들었고, 이는 훗날 재즈의 핵심 요소로 발전한 스윙·그루브의 초기 형태로 평가됩니다. 다만 멜로디에는 즉흥성이 없어 재즈 그 자체라기보다 재즈의 전신으로 간주되었고, 즉흥적이지 않았기에 악보로 인쇄되어 널리 유통될 수 있어 대륙횡단철도 노동자들 사이에서도 큰 인기를 끌었습니다."
@@ -43,9 +43,9 @@ const dataList: DataType[] = [
       improvisation: 3,
       map : "/img/Map_03.png",
       artist: ["Jelly Roll Morton", "Louis Armstrong & His Hot Five", "Bix Beiderbecke"],
-      artistImage: ["/img/img_3-1_jelly_roll_morton.png", "/img/img_1-2_jelly_roll_morton.png", "/img/img_1-3_w.c._handy.png"],
+      artistImage: ["/img/img_3-1_jelly_roll_morton.png", "/img/img_3-2_louis_armstrong.png", "/img/img_3-3_bix_beiderbecke.png"],
       song: ["King Porter Stomp", "Hotter Than That", "Singin' The Blues"],
-      sound : ["/music/3-1 King Porter Stomp.m4a", "/music/3-3 Singin' The Blues.m4a"],
+      sound : ["/music/3-1 King Porter Stomp.m4a", "/music/3-2 Hotter Than That.m4a", "/music/3-3 Singin The Blues.m4a"],
       GenreInfo: "시카고 재즈는 뉴올리언스에서 활동하던 흑인 음악가들이 미시시피 강 증기선과 이주 흐름을 따라 북상하면서 발전한 재즈의 새로운 형태였습니다. 당시 뉴올리언스와 세인트루이스를 오가던 증기선에는 무도회장이 있어 많은 음악가들이 연주하며 생계를 이어갔고, 그중 페이트 매러블의 켄터키 재즈 악단은 ‘떠다니는 음악학교’라 불릴 만큼 뛰어난 연주자들을 배출했습니다. 루이 암스트롱 역시 이 악단 출신으로, 1922년 시카고로 이주하면서 시카고 재즈의 형성을 이끌었습니다. 금주법 시기 시카고는 갱스터 조직이 운영한 스피크이지 문화가 번성해 재즈가 주요 엔터테인먼트로 자리 잡았고, 이러한 환경에서 암스트롱은 핫 파이브와 핫 세븐 밴드를 결성해 재즈 표현의 혁신을 이뤄냈습니다. 그는 멜로디를 매번 새롭게 변주하며 악기의 톤을 극대화했고, 기존의 집단 즉흥 연주를 개인 중심의 솔로 연주로 전환시켜 시카고 재즈의 가장 큰 특징을 확립했습니다."
     },
     {
@@ -69,7 +69,7 @@ const dataList: DataType[] = [
       artist: ["Dizzy Gillespie", "Thelonious Monk", "Charlie Parker"],
       artistImage: ["/img/img_1-1_scott_joplin.png", "/img/img_1-2_jelly_roll_morton.png", "/img/img_1-3_w.c._handy.png"],
       song: ["A Night in Tunisia", "‘Round Midnight", "Ornithology"],
-      sound : ["/music/5-1 A Night In Tunisia.m4a", "/music/5-2 Round Midnight.m4a"],
+      sound : ["/music/5-1 A Night In Tunisia.m4a", "/music/5-2 Round Midnight.m4a", "/music/5-3 Ornithology.m4a"],
       GenreInfo: "비밥은 스윙 시대의 상업화된 연주 방식에 반기를 든 연주자들이 뉴욕 할렘의 민턴스 플레이하우스 같은 장소에 모여 즉흥성과 강렬한 리듬을 탐구하며 탄생한 새로운 재즈 형태입니다. 특히 백인 중심 음악 산업에 대한 불만을 가진 흑인 뮤지션들은 스윙의 틀로는 표현할 수 없었던 음악적 자유를 추구했고, 이는 제2차 세계대전 이후 강화된 인종차별과 사회적 억압에 맞서는 상징적 의미도 지녔습니다. 비밥은 복잡한 화성 진행과 빠른 프레이징을 통해 흑인들의 불안과 저항을 음악적으로 드러냈습니다. 음악적 특징으로는 즉흥 연주의 극대화가 중심이었으며, 이를 위해 텐션 노트와 대리 코드를 활용해 기존 화성을 재구성하며 독창적인 선율을 만들었습니다. 색소폰과 트럼펫은 비브라토, 벤딩, 글리산도 같은 기법으로 표현력을 확장했고, 대규모 빅밴드 대신 소규모 콤보가 중심이 되어 연주자 간 대화와 창의성이 강조되었습니다. 이러한 혁신은 재즈를 댄스 음악에서 예술적 음악으로 끌어올렸지만, 난해한 구조로 인해 대중성과는 거리가 멀어지는 한계도 남겼습니다."
     },
     {

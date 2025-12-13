@@ -1,34 +1,663 @@
-/**
- * Game flow
- * 1. URL에서 index/song 파라미터를 읽는다
- * 2. 음악과 autochart를 비동기로 로드한다
- * 3. 차트가 준비되면 READY → COUNTDOWN 상태로 전이
- * 4. 5초 카운트다운 후 음악 재생 및 게임 루프 시작
- * 5. 매 프레임 audio.currentTime 기준으로 노트를 렌더/판정
- * 6. Perfect(≤0.05s)/Great/Good/Miss 기준으로 점수·콤보·통계를 기록
- * 7. 노래 종료 시 RESULT 화면에 성적을 노출한다
- */
+"use client";
 
-// 1. url에서 index와 song index 가져오기
-// 2. 음악 파일 로딩 
-// 3. autochart.ts 로딩 + 자동 차트 생성
-// 4. 게임 상태(state)를 “ready”로 전환
-// 5. 5초 카운트다운 시작
-// 6. 카운트다운 종료 → 음악 재생 시작
-// 7. GameLoop에서 매 프레임 실행되는 일 (핵심)
-// 7-1. 현재 시간(now = audio.currentTime) 측정
-// 7-2. 노트 스폰 / 화면 표시
-// 7-3. 판정선에 맞춰서 노트 판정 및 이펙트(텍스트 : perfect, great, good, miss) 표시
-// 7-4. 판정 (입력 처리) : <= 0.05 → Perfect 10점, <= 0.10 → Great 5점, <= 0.15 → Good 1점, > 0.15 → Miss 0점
-// 8. 점수 UI 실시간 업데이트 : 점수
-// 9. 노래 종료 감지
-// 10. 결과 화면 표시 (종합 결과) : 점수, 미스 횟수, 판정 통계, 랭킹 등
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Link from "next/link";
+import dataList from "@/app/database";
 
+// ============================================
+// Types
+// ============================================
+
+type GameState = "loading" | "ready" | "countdown" | "playing" | "result";
+type Judgment = "PERFECT" | "GREAT" | "GOOD" | "MISS";
+
+interface TapNote {
+  type: "tap";
+  lane: number;
+  time: number;
+  hit?: boolean;
+  missed?: boolean;
+  judgment?: Judgment;
+}
+
+interface HoldNote {
+  type: "hold";
+  lane: number;
+  start: number;
+  end: number;
+  hit?: boolean;
+  missed?: boolean;
+  judgment?: Judgment;
+}
+
+type GameNote = TapNote | HoldNote;
+
+interface ChartData {
+  bpm: number | null;
+  offset: number;
+  notes: GameNote[];
+}
+
+interface GameStats {
+  perfect: number;
+  great: number;
+  good: number;
+  miss: number;
+}
+
+// ============================================
+// Constants
+// ============================================
+
+const CANVAS_WIDTH = 360;
+const CANVAS_HEIGHT = 700;
+const LANE_COUNT = 4;
+const HIT_LINE_Y = 600;
+const NOTE_SPEED = 400; // pixels per second
+const NOTE_HEIGHT = 20;
+
+// 판정 윈도우 (초)
+const PERFECT_WINDOW = 0.05;
+const GREAT_WINDOW = 0.10;
+const GOOD_WINDOW = 0.15;
+
+// 점수
+const SCORE_PERFECT = 300;
+const SCORE_GREAT = 200;
+const SCORE_GOOD = 100;
+
+// 키 매핑
+const KEY_MAP: Record<string, number> = {
+  d: 0,
+  f: 1,
+  j: 2,
+  k: 3,
+};
+
+// 레인 색상
+const LANE_COLORS = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"];
+
+// ============================================
+// Main Component
+// ============================================
 
 export default function GamePage() {
+  // URL 파라미터
+  const searchParams = useSearchParams();
+  const index = parseInt(searchParams.get("index") || "0", 10);
+  const songIndex = parseInt(searchParams.get("song") || "0", 10);
+
+  // Refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const chartRef = useRef<ChartData | null>(null);
+
+  // State
+  const [gameState, setGameState] = useState<GameState>("loading");
+  const [countdown, setCountdown] = useState(5);
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [lastJudgment, setLastJudgment] = useState<Judgment | null>(null);
+  const [stats, setStats] = useState<GameStats>({
+    perfect: 0,
+    great: 0,
+    good: 0,
+    miss: 0,
+  });
+
+  // 곡 정보
+  const songData = dataList[index];
+  const audioSrc = songData?.sound?.[songIndex] || "";
+  const songTitle = songData?.song?.[songIndex] || "Unknown";
+  const artistName = songData?.artist?.[songIndex] || "Unknown";
+
+  // ============================================
+  // Canvas Drawing Functions
+  // ============================================
+
+  /**
+   * 레인 그리기
+   */
+  const drawLanes = useCallback((ctx: CanvasRenderingContext2D) => {
+    const laneWidth = CANVAS_WIDTH / LANE_COUNT;
+
+    // 레인 배경
+    for (let i = 0; i < LANE_COUNT; i++) {
+      ctx.fillStyle = i % 2 === 0 ? "#1a1a1a" : "#222222";
+      ctx.fillRect(i * laneWidth, 0, laneWidth, CANVAS_HEIGHT);
+
+      // 레인 구분선
+      ctx.strokeStyle = "#333333";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(i * laneWidth, 0);
+      ctx.lineTo(i * laneWidth, CANVAS_HEIGHT);
+      ctx.stroke();
+    }
+
+    // 판정선
+    ctx.fillStyle = "#BAEE2A";
+    ctx.fillRect(0, HIT_LINE_Y - 2, CANVAS_WIDTH, 4);
+
+    // 키 힌트
+    const keys = ["D", "F", "J", "K"];
+    ctx.fillStyle = "#666666";
+    ctx.font = "14px DogicaPixel";
+    ctx.textAlign = "center";
+    for (let i = 0; i < LANE_COUNT; i++) {
+      ctx.fillText(keys[i], i * laneWidth + laneWidth / 2, HIT_LINE_Y + 30);
+    }
+  }, []);
+
+  /**
+   * 노트 그리기
+   */
+  const drawNotes = useCallback((ctx: CanvasRenderingContext2D, now: number) => {
+    if (!chartRef.current) return;
+
+    const laneWidth = CANVAS_WIDTH / LANE_COUNT;
+    const noteWidth = laneWidth * 0.7;
+    const noteMargin = (laneWidth - noteWidth) / 2;
+
+    for (const note of chartRef.current.notes) {
+      // 이미 처리된 노트는 스킵
+      if (note.hit || note.missed) continue;
+
+      const noteTime = note.type === "tap" ? note.time : note.start;
+      const y = HIT_LINE_Y - (noteTime - now) * NOTE_SPEED;
+
+      // 화면 밖 노트는 스킵
+      if (y < -100 || y > CANVAS_HEIGHT + 100) continue;
+
+      const x = note.lane * laneWidth + noteMargin;
+
+      if (note.type === "tap") {
+        // Tap 노트
+        ctx.fillStyle = LANE_COLORS[note.lane];
+        ctx.fillRect(x, y - NOTE_HEIGHT / 2, noteWidth, NOTE_HEIGHT);
+
+        // 테두리
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y - NOTE_HEIGHT / 2, noteWidth, NOTE_HEIGHT);
+      } else {
+        // Hold 노트
+        const endY = HIT_LINE_Y - (note.end - now) * NOTE_SPEED;
+        const holdHeight = y - endY;
+
+        ctx.fillStyle = LANE_COLORS[note.lane] + "AA";
+        ctx.fillRect(x, endY, noteWidth, holdHeight);
+
+        // 시작/끝 표시
+        ctx.fillStyle = LANE_COLORS[note.lane];
+        ctx.fillRect(x, y - NOTE_HEIGHT / 2, noteWidth, NOTE_HEIGHT);
+        ctx.fillRect(x, endY - NOTE_HEIGHT / 2, noteWidth, NOTE_HEIGHT);
+      }
+    }
+  }, []);
+
+  /**
+   * 판정 텍스트 그리기
+   */
+  const drawJudgment = useCallback((ctx: CanvasRenderingContext2D) => {
+    if (!lastJudgment) return;
+
+    const colors: Record<Judgment, string> = {
+      PERFECT: "#BAEE2A",
+      GREAT: "#4ECDC4",
+      GOOD: "#FFD93D",
+      MISS: "#FF6B6B",
+    };
+
+    ctx.fillStyle = colors[lastJudgment];
+    ctx.font = "bold 24px DogicaPixel";
+    ctx.textAlign = "center";
+    ctx.fillText(lastJudgment, CANVAS_WIDTH / 2, HIT_LINE_Y - 50);
+  }, [lastJudgment]);
+
+  /**
+   * 콤보 그리기
+   */
+  const drawCombo = useCallback((ctx: CanvasRenderingContext2D) => {
+    if (combo < 2) return;
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 32px DogicaPixel";
+    ctx.textAlign = "center";
+    ctx.fillText(`${combo}`, CANVAS_WIDTH / 2, HIT_LINE_Y - 100);
+
+    ctx.fillStyle = "#888888";
+    ctx.font = "12px DogicaPixel";
+    ctx.fillText("COMBO", CANVAS_WIDTH / 2, HIT_LINE_Y - 75);
+  }, [combo]);
+
+  // ============================================
+  // Game Logic Functions
+  // ============================================
+
+  /**
+   * 가장 가까운 노트 찾기
+   */
+  const findClosestNote = useCallback((lane: number, now: number): GameNote | null => {
+    if (!chartRef.current) return null;
+
+    let closest: GameNote | null = null;
+    let minDiff = Infinity;
+
+    for (const note of chartRef.current.notes) {
+      if (note.lane !== lane || note.hit || note.missed) continue;
+
+      const noteTime = note.type === "tap" ? note.time : note.start;
+      const diff = Math.abs(noteTime - now);
+
+      if (diff < minDiff && diff <= GOOD_WINDOW + 0.1) {
+        minDiff = diff;
+        closest = note;
+      }
+    }
+
+    return closest;
+  }, []);
+
+  /**
+   * 판정 처리
+   */
+  const judgeHit = useCallback((lane: number) => {
+    if (gameState !== "playing" || !audioRef.current) return;
+
+    const now = audioRef.current.currentTime;
+    const note = findClosestNote(lane, now);
+
+    if (!note) return;
+
+    const noteTime = note.type === "tap" ? note.time : note.start;
+    const diff = Math.abs(noteTime - now);
+
+    let judgment: Judgment;
+    let scoreAdd = 0;
+
+    if (diff <= PERFECT_WINDOW) {
+      judgment = "PERFECT";
+      scoreAdd = SCORE_PERFECT;
+    } else if (diff <= GREAT_WINDOW) {
+      judgment = "GREAT";
+      scoreAdd = SCORE_GREAT;
+    } else if (diff <= GOOD_WINDOW) {
+      judgment = "GOOD";
+      scoreAdd = SCORE_GOOD;
+    } else {
+      judgment = "MISS";
+      scoreAdd = 0;
+    }
+
+    // 노트 상태 업데이트
+    note.hit = true;
+    note.judgment = judgment;
+
+    // 점수 및 콤보 업데이트
+    setScore((prev) => prev + scoreAdd);
+    setLastJudgment(judgment);
+
+    if (judgment === "MISS") {
+      setCombo(0);
+    } else {
+      setCombo((prev) => {
+        const newCombo = prev + 1;
+        setMaxCombo((max) => Math.max(max, newCombo));
+        return newCombo;
+      });
+    }
+
+    // 통계 업데이트
+    setStats((prev) => ({
+      ...prev,
+      [judgment.toLowerCase()]: prev[judgment.toLowerCase() as keyof GameStats] + 1,
+    }));
+  }, [gameState, findClosestNote]);
+
+  /**
+   * 놓친 노트 체크
+   */
+  const checkMissedNotes = useCallback((now: number) => {
+    if (!chartRef.current) return;
+
+    for (const note of chartRef.current.notes) {
+      if (note.hit || note.missed) continue;
+
+      const noteTime = note.type === "tap" ? note.time : note.start;
+
+      if (now > noteTime + GOOD_WINDOW) {
+        note.missed = true;
+        note.judgment = "MISS";
+
+        setCombo(0);
+        setLastJudgment("MISS");
+        setStats((prev) => ({ ...prev, miss: prev.miss + 1 }));
+      }
+    }
+  }, []);
+
+  // ============================================
+  // Game Loop
+  // ============================================
+
+  const startGameLoop = useCallback(() => {
+    const canvas = canvasRef.current;
+    const audio = audioRef.current;
+    if (!canvas || !audio) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const render = () => {
+      if (gameState !== "playing") return;
+
+      const now = audio.currentTime;
+
+      // 캔버스 클리어
+      ctx.fillStyle = "#111111";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // 그리기
+      drawLanes(ctx);
+      drawNotes(ctx, now);
+      drawJudgment(ctx);
+      drawCombo(ctx);
+
+      // 놓친 노트 체크
+      checkMissedNotes(now);
+
+      rafRef.current = requestAnimationFrame(render);
+    };
+
+    rafRef.current = requestAnimationFrame(render);
+  }, [gameState, drawLanes, drawNotes, drawJudgment, drawCombo, checkMissedNotes]);
+
+  // ============================================
+  // Effects
+  // ============================================
+
+  // 오디오 및 차트 로드
+  useEffect(() => {
+    if (!audioSrc) return;
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.src = audioSrc;
+    audio.load();
+
+    let cancelled = false;
+
+    const loadChart = async () => {
+      try {
+        const { generateAutoChart } = await import("./autochart");
+        const chart = await generateAutoChart(audioSrc);
+
+        if (cancelled) return;
+
+        // 노트에 hit/missed 속성 추가
+        chart.notes = chart.notes.map((note) => ({
+          ...note,
+          hit: false,
+          missed: false,
+        }));
+
+        chartRef.current = chart as ChartData;
+        setGameState("ready");
+      } catch (error) {
+        console.error("차트 생성 오류:", error);
+      }
+    };
+
+    loadChart();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [audioSrc]);
+
+  // 카운트다운 시작 (ready → countdown)
+  useEffect(() => {
+    if (gameState !== "ready") return;
+
+    setGameState("countdown");
+    setCountdown(5);
+  }, [gameState]);
+
+  // 카운트다운 진행
+  useEffect(() => {
+    if (gameState !== "countdown") return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setGameState("playing");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState]);
+
+  // 게임 시작 (playing 상태 진입 시)
+  useEffect(() => {
+    if (gameState !== "playing") return;
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch((err) => console.error("오디오 재생 오류:", err));
+    }
+
+    startGameLoop();
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [gameState, startGameLoop]);
+
+  // 오디오 종료 감지
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      setGameState("result");
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    return () => audio.removeEventListener("ended", handleEnded);
+  }, []);
+
+  // 키보드 입력
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const lane = KEY_MAP[e.key.toLowerCase()];
+      if (lane !== undefined) {
+        e.preventDefault();
+        judgeHit(lane);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [judgeHit]);
+
+  // 터치 입력
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (gameState !== "playing") return;
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const laneWidth = rect.width / LANE_COUNT;
+
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        const x = touch.clientX - rect.left;
+        const lane = Math.floor(x / laneWidth);
+
+        if (lane >= 0 && lane < LANE_COUNT) {
+          judgeHit(lane);
+        }
+      }
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    return () => canvas.removeEventListener("touchstart", handleTouchStart);
+  }, [gameState, judgeHit]);
+
+  // 정확도 계산
+  const totalNotes = stats.perfect + stats.great + stats.good + stats.miss;
+  const accuracy = totalNotes > 0
+    ? ((stats.perfect * 100 + stats.great * 80 + stats.good * 50) / (totalNotes * 100) * 100).toFixed(1)
+    : "0.0";
+
+  // 재시도
+  const handleRetry = () => {
+    setGameState("loading");
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setStats({ perfect: 0, great: 0, good: 0, miss: 0 });
+    setLastJudgment(null);
+
+    // 차트 리셋
+    if (chartRef.current) {
+      chartRef.current.notes = chartRef.current.notes.map((note) => ({
+        ...note,
+        hit: false,
+        missed: false,
+        judgment: undefined,
+      }));
+    }
+
+    setTimeout(() => setGameState("ready"), 100);
+  };
+
+  // ============================================
+  // Render
+  // ============================================
+
   return (
-    <div className="w-[360px] h-[800px] bg-black text-white mx-auto relative">
-      <h1>Game</h1>
+    <div className="page-container overflow-hidden">
+      {/* 헤더 */}
+      <div className="absolute top-0 left-0 right-0 z-10 p-4 flex justify-between items-start">
+        <Link href="/03_select_artist" className="text-gray T3_12_DB">
+          ↩︎ BACK
+        </Link>
+        <div className="text-right">
+          <p className="T2_16_DB text-green">{score}</p>
+          <p className="T4_10_DB text-gray">SCORE</p>
+        </div>
+      </div>
+
+      {/* 곡 정보 */}
+      <div className="absolute top-12 left-0 right-0 text-center z-10">
+        <p className="T4_10_DB text-gray">{artistName}</p>
+        <p className="T3_12_DB text-white">{songTitle}</p>
+      </div>
+
+      {/* 캔버스 */}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
+        className="block mx-auto mt-20"
+        style={{ touchAction: "none" }}
+      />
+
+      {/* 로딩 오버레이 */}
+      {gameState === "loading" && (
+        <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
+          <p className="T2_16_DB text-green animate-pulse">LOADING...</p>
+        </div>
+      )}
+
+      {/* 카운트다운 오버레이 */}
+      {gameState === "countdown" && countdown > 0 && (
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="text-center">
+            <p className="text-8xl font-bold text-green">{countdown}</p>
+            <p className="T3_12_DB text-gray mt-4">GET READY!</p>
+          </div>
+        </div>
+      )}
+
+      {/* 결과 화면 */}
+      {gameState === "result" && (
+        <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50 gap-4">
+          <p className="T1_20_DB text-green mb-4">RESULT</p>
+
+          <div className="text-center space-y-2">
+            <p className="T2_16_DB text-white">SCORE</p>
+            <p className="text-4xl font-bold text-green">{score}</p>
+          </div>
+
+          <div className="flex gap-8 mt-4">
+            <div className="text-center">
+              <p className="T3_12_DB text-gray">MAX COMBO</p>
+              <p className="T2_16_DB text-white">{maxCombo}</p>
+            </div>
+            <div className="text-center">
+              <p className="T3_12_DB text-gray">ACCURACY</p>
+              <p className="T2_16_DB text-white">{accuracy}%</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-4 mt-4 text-center">
+            <div>
+              <p className="T4_10_DB text-[#BAEE2A]">PERFECT</p>
+              <p className="T3_12_DB text-white">{stats.perfect}</p>
+            </div>
+            <div>
+              <p className="T4_10_DB text-[#4ECDC4]">GREAT</p>
+              <p className="T3_12_DB text-white">{stats.great}</p>
+            </div>
+            <div>
+              <p className="T4_10_DB text-[#FFD93D]">GOOD</p>
+              <p className="T3_12_DB text-white">{stats.good}</p>
+            </div>
+            <div>
+              <p className="T4_10_DB text-[#FF6B6B]">MISS</p>
+              <p className="T3_12_DB text-white">{stats.miss}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 mt-8">
+            <button
+              onClick={handleRetry}
+              className="T3_12_DB px-6 py-3 border-2 border-green text-green clip-corner-2"
+            >
+              RETRY
+            </button>
+            <Link
+              href="/"
+              className="T3_12_DB px-6 py-3 border-2 border-gray text-gray clip-corner-2"
+            >
+              HOME
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* 오디오 */}
+      <audio ref={audioRef} />
     </div>
-  )
+  );
 }
