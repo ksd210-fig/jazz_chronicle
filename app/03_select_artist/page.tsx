@@ -146,7 +146,7 @@ export default function SelectArtistPage() {
                     </div>
                     <div 
                       className={`px-2 border-2 flex flex-col items-center justify-center clip-corner-2 ${isSelected ? 'border-green' : 'border-transparent'}`} 
-                      style={{ minWidth: '56px', minHeight: '48px', flexShrink: 0 }}>
+                      style={{ minWidth: '56px', minHeight: '40px', flexShrink: 0 }}>
                       {isSelected && (
                         <Link
                           href={`/04_game?index=${index}&song=${i}`}

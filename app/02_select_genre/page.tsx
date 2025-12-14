@@ -19,7 +19,7 @@ export default function SelectGenre() {
 
   // 정보 테이블 데이터
   const infoRows = [
-    { label: "CITY", value: currentData.city },
+    { label: "CITY", value: currentData.city.toUpperCase() },
     { label: "YEAR", value: currentData.year },
   ];
 
@@ -38,14 +38,14 @@ export default function SelectGenre() {
         {/* 정보 패널 */}
         <div className="w-full border-2 border-gray mb-4 clip-corner-2">
           {/* 제목 바 */}
-          <div className="bg-green-press px-4 py-2 flex justify-center border-b border-gray">
+          <div className="bg-green-press px-4 py-2 flex justify-center border-b-2 border-gray">
             <h2 className="T2_16_DB text-green">{currentData.genre}</h2>
           </div>
 
           {/* 정보 테이블 */}
           <div className="relative px-4 py-3 bg-black C1_13_DR text-white">
             {/* 세로선 */}
-            <div className="absolute left-[40%] top-0 bottom-0 border-l border-gray"></div>
+            <div className="absolute left-[40%] top-0 bottom-0 border-l-2 border-gray"></div>
 
             {/* 정보 행들 */}
             {infoRows.map((row, i) => (
